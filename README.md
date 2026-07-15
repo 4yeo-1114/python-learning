@@ -6,7 +6,8 @@
 
 - [x] **Day 1** — 环境搭建 & 基础语法（print、注释、缩进）
 - [x] **Day 2** — 数据结构（list / tuple / dict / set、切片、推导式）
-- [ ] Day 3~7 — 控制流、函数、文件操作…
+- [ ] **Day 3** — 文件操作、字符串方法、异常处理、模块导入（👈 当前）
+- [ ] Day 4~7 — 控制流、OOP、综合练习…
 - [ ] Week 2 — 面向对象、异常处理、装饰器
 - [ ] Week 3 — SQLite、JSON/CSV、pathlib
 - [ ] Week 4 — 命令行版学生管理系统
@@ -21,6 +22,7 @@
 ├── projects/
 │   ├── day01_basics/        # Day 1：基础语法
 │   ├── day02_data_structures/  # Day 2：数据结构
+│   ├── day03_file_io/          # Day 3：文件操作 & 异常处理
 │   └── student_system_cli/  # 最终项目（进行中）
 └── README.md
 ```
