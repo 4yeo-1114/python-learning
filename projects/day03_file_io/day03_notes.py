@@ -88,7 +88,7 @@ print(f"\n=== 2. 文件操作 ===")
 
 # 2.2 写入文件
 with open("day03_demo.txt", "w", encoding="utf-8") as f:
-    f.write("第一行：Hello Python！\n")
+    f.write("第一行:Hello Python!\n")
     f.write("第二行：文件操作很简单\n")
     f.writelines(["第三行：列表写入\n", "第四行：一行一个\n"])
 
@@ -190,7 +190,7 @@ content = safe_read_file("不存在的文件.txt")
 print(f"读取结果: {content}")
 
 content = safe_read_file("day03_demo.txt")
-print(f"读取成功！前20字符: {content[:20] if content else 'None'}...")
+print(f"读取成功!前20字符: {content[:20] if content else 'None'}...")
 
 
 # ============================================================

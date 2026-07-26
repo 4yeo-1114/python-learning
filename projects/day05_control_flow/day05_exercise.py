@@ -43,11 +43,14 @@ while attempt<Max_guess:
     attempt += 1
     if guess == ans:
         print(f"对了!你用了{attempt}次就猜对了🎉")
+        break
     elif guess < ans:
         print(f"太小了!")
     elif guess > ans:
         print(f"太大了!")
-
+else:
+    #while...else 循环没有被break中断时执行
+    print(f"机会用完了!答案是{ans}!")
 
 # ============================================================
 # 练习 2：FizzBuzz 变体（控制流基础）

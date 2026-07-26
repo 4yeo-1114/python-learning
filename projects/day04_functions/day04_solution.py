@@ -196,6 +196,7 @@ def analyze(students):
     avg_english = sum(s["english"] for s in students) / total
     avg_python = sum(s["python"] for s in students) / total
 
+
     # 总分最高的学生
     top_student = max(students, key=lambda s: s["math"] + s["english"] + s["python"])
 

@@ -17,7 +17,7 @@ print("\n--- 默认参数 ---")
 # 基本用法：和 C++ 一样
 def greet(name, greeting="你好"):
     """默认参数：调用者可以不传 greeting"""
-    return f"{greeting}，{name}！"
+    return f"{greeting},{name}!"
 
 print(greet("张三"))              # 使用默认值
 print(greet("李四", "早上好"))    # 覆盖默认值
@@ -58,7 +58,7 @@ print("\n--- 关键字参数 ---")
 
 def create_student(name, age, major, city="北京"):
     """Python 支持按参数名传参"""
-    return f"{name}，{age}岁，{major}专业，来自{city}"
+    return f"{name},{age}岁,{major}专业，来自{city}"
 
 # 按位置传参（C++ 风格）
 print(create_student("张三", 20, "计算机"))
@@ -74,7 +74,7 @@ print(create_student("王五", 19, major="物理", city="上海"))
 
 
 # 1.3 *args — 接收任意数量的位置参数
-print("\n--- *args（可变位置参数）---")
+print("\n--- *args(可变位置参数)---")
 
 def sum_all(*args):
     """*args 把传入的所有位置参数打包成一个元组"""
@@ -93,7 +93,7 @@ print(f"sum_all(*nums)       = {sum_all(*nums)}")  # *解包列表 → sum(1,2,3
 
 
 # 1.4 **kwargs — 接收任意数量的关键字参数
-print("\n--- **kwargs（可变关键字参数）---")
+print("\n--- **kwargs(可变关键字参数)---")
 
 def print_info(**kwargs):
     """**kwargs 把传入的关键字参数打包成一个字典"""
@@ -430,6 +430,7 @@ passed_python = [
     for s in students_data
     if s["score"] >= 85
 ]
+
 for item in passed_python:
     print(f"  {item}")
 

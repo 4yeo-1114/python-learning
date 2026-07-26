@@ -639,45 +639,8 @@ print(f"实际计算次数: {call_count}")  # 31（没有缓存的话要算 269 
 
 
 # ============================================================
-# 综合示例：模拟一个"请求 API → 失败重试 → 收集数据"的流程
+#综合示例：带重试机制的 HTTP 请求模拟
 # ============================================================
-#
-# 场景设定：
-#   你要从远程 API 拉取学生列表。网络不稳定，偶尔会失败。
-#   你希望：失败了自动重试，最后把所有拿到的数据汇总。
-#
-# 用到的知识点：
-#   - 自定义异常：NetworkError
-#   - 装饰器：@retry_on_network_error（失败自动重试）
-#   - 生成器：fetch_students_page()（惰性分页，用到了才请求下一页）
-#   - 异常处理：try/except 捕获错误后决定"继续"还是"放弃"
-#
-# 整体关系图：
-#
-#   ┌─────────────────────────────────────────┐
-#   │  collect_all_students()   ← 总调度      │
-#   │  @retry_on_network_error(max_tries=3)    │
-#   │                                          │
-#   │  try:                                    │
-#   │    for data in fetch_students_page():    │
-#   │      收集 data                           │
-#   │  except NetworkError:                    │
-#   │    跳过这一页，继续下一页                  │
-#   └───────┬─────────────────────────────────┘
-#           │ 调用（每次迭代触发）
-#           ▼
-#   ┌──────────────────────┐
-#   │  fetch_students_page │  ← 分页生成器
-#   │  yield 第1页         │
-#   │  yield 第2页         │    30% 概率 raise NetworkError
-#   │  yield 第3页         │
-#   └──────────────────────┘
-#
-# 注意：装饰器不能直接装饰生成器！
-# 原因：调用生成器函数只返回一个 generator 对象，不执行函数体。
-#      真正执行（可能抛异常）发生在 for 循环迭代时。
-#      所以这里的 @retry 装饰在 collect_all_students（普通函数）上，
-#      而不是 fetch_students_page（生成器）上。
 
 print("\n" + "=" * 60)
 print("综合示例：装饰器 + 异常处理 + 生成器")
@@ -685,144 +648,69 @@ print("=" * 60)
 
 import random
 
-# ── 第 1 块：自定义异常 ──
-print("\n--- 第 1 块：自定义异常 ---")
-
+# 自定义异常
 class NetworkError(Exception):
-    """网络请求失败"""
     pass
 
-# 就一行：继承 Exception，搞定。C++ 要写整个类体，Python 一个 pass 就行。
+class TimeoutError(NetworkError):
+    pass
 
-# ── 第 2 块：生成器（分页获取数据） ──
-print("--- 第 2 块：分页获取（生成器） ---")
-
-def fetch_students_page(url, total_pages=3):
-    """
-    生成器函数：一页一页地从 API 拉数据。
-    每页 30% 概率失败（模拟网络不稳定）。
-
-    关键：用 yield 而不是 return！
-    → 调用者"要一页"，才去"请求一页"
-    → 不是一口气把所有页都拉回来
-    """
-    for page in range(1, total_pages + 1):
-        # 模拟：30% 概率网络故障
-        if random.random() < 0.3:
-            raise NetworkError(f"请求 {url}?page={page} 时网络超时")
-        # 成功：返回这一页的数据
-        students = [f"student_{page}_{i}" for i in range(1, 4)]
-        yield {"page": page, "students": students}
-        #      ↑ yield = "给你，我在这儿暂停，下次从这继续"
-
-# 演示生成器的"暂停-恢复"特性
-# 固定随机种子，让前两页一定成功（方便演示）
-random.seed(42)
-gen = fetch_students_page("/api/students", total_pages=3)
-print(f"生成器对象: {gen}")
-try:
-    print(f"  next #1: {next(gen)}")  # 第1页 → 执行到第一个 yield，暂停
-    print(f"  next #2: {next(gen)}")  # 第2页 → 从暂停处继续，再次暂停
-    # 不再调用 next(gen)，第3页永远不会被请求！
-    # 这就是"惰性"：不请求就不会浪费资源
-except NetworkError:
-    print("  (演示中遇到了随机失败，这不影响理解生成器的暂停-恢复机制)")
-
-# ── 第 3 块：带重试的装饰器 ──
-print("\n--- 第 3 块：@retry_on_network_error 装饰器 ---")
-
-def retry_on_network_error(max_tries=3, delay=0.1):
-    """
-    装饰器：被装饰的函数如果抛出 NetworkError，自动重试。
-
-    这不是装饰生成器的！是装饰 collect_all_students 这种"调度函数"的。
-    """
+# 带重试的装饰器（装饰器 + 异常处理结合）
+def retry(max_attempts=3, delay=0.1):
+    """装饰器：失败自动重试"""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            last_error = None
-            for attempt in range(1, max_tries + 1):      # 第1次、第2次、第3次
+            for attempt in range(1, max_attempts + 1):
                 try:
-                    result = func(*args, **kwargs)       # 调用被装饰的函数
-                    return result                         # 成功 → 直接返回
+                    result = func(*args, **kwargs)
+                    return result
                 except NetworkError as e:
-                    last_error = e
-                    print(f"  [重试 {attempt}/{max_tries}] {e}")
-                    if attempt < max_tries:
-                        time.sleep(delay)                 # 等一会儿再试
-            # 所有尝试都失败了
-            raise last_error
+                    print(f"  [重试] 第 {attempt} 次失败: {e}")
+                    if attempt < max_attempts:
+                        time.sleep(delay)
+                    else:
+                        raise  # 重试用完，抛出异常
+            return None
         return wrapper
     return decorator
 
-# ── 第 4 块：用装饰器和生成器拼出完整逻辑 ──
-print("--- 第 4 块：组合在一起 ---")
-
-@retry_on_network_error(max_tries=3)
-def collect_all_students(url, total_pages=3):
-    """
-    收集所有分页的学生数据。
-
-    逻辑很简单：
-      遍历生成器的每一页 → 成功就存起来 → 某页失败？
-      NetworkError 会被 @retry_on_network_error 捕获，整个函数重来一遍。
-    """
-    all_students = []
-    for page_data in fetch_students_page(url, total_pages):
-        print(f"  [OK] 第{page_data['page']}页: {page_data['students']}")
-        all_students.extend(page_data['students'])
-    return all_students
-
-# ── 测试 ──
-print("\n=== 开始测试 ===")
-random.seed(123)  # 固定随机种子，结果可复现
-
-try:
-    result = collect_all_students("/api/students", total_pages=3)
-    print(f"\n最终收集到 {len(result)} 个学生: {result}")
-except NetworkError:
-    print(f"\n[!] 重试 3 次全部失败，放弃")
-
-print("\n=== 另一种写法：逐页容错 ===\n")
-# 如果你不想"整个函数重试"，而是"失败一页跳过，继续下一页"：
-
-def collect_skip_on_error(url, total_pages=3):
-    """逐页处理：某一页失败 → 跳过它，继续拿后面的"""
-    all_students = []
+# 生成器：模拟从 API 分页获取数据
+def fetch_pages(url, total_pages=3):
+    """模拟分页获取数据 — 生成器"""
     for page in range(1, total_pages + 1):
-        try:
-            gen = fetch_students_page(url, total_pages)
-            # 跳过前面已处理过的页
-            for _ in range(page - 1):
-                next(gen)
-            page_data = next(gen)
-            all_students.extend(page_data['students'])
-            print(f"  [OK] 第{page}页获取成功")
-        except NetworkError as e:
-            print(f"  [SKIP] 第{page}页失败: {e}，跳过")
-    return all_students
+        # 模拟：有时请求失败
+        if random.random() < 0.3:  # 30% 概率失败
+            raise NetworkError(f"{url}?page={page} 请求失败")
+        yield {f"page_{page}": [f"data_{page}_{i}" for i in range(3)]}
 
-random.seed(456)
-result2 = collect_skip_on_error("/api/students", total_pages=3)
-print(f"逐页容错模式收集到 {len(result2)} 个学生: {result2}")
+# 用装饰器给生成器函数加日志
+def log_calls(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f"[调用] {func.__name__}({args}, {kwargs})")
+        result = func(*args, **kwargs)
+        print(f"[返回] {func.__name__} 完成")
+        return result
+    return wrapper
 
-# ── 关键要点总结 ──
-print("\n" + "=" * 60)
-print("综合示例要点回顾")
-print("=" * 60)
-print("""
-1. 装饰器不能直接装饰生成器 — 生成器在 for 迭代时才执行，
-   装饰器的 wrapper 只包裹了"创建生成器"这一步，捕获不到迭代时的异常。
+@log_calls
+def collect_data(url):
+    """收集所有分页数据 — 带重试"""
+    all_data = []
+    try:
+        # 生成器表达式：惰性获取
+        for page_data in fetch_pages(url):
+            all_data.append(page_data)
+            print(f"  获取到: {page_data}")
+    except NetworkError as e:
+        print(f"  [!] 数据收集中断: {e}")
+    return all_data
 
-2. 两种错误处理策略：
-   - 整体重试：@retry 装饰在调度函数上，失败整个重来
-   - 逐页跳过：try/except 包住单次迭代，失败就跳过
-
-3. 生成器的优势：不必一次性拉回全部数据，惰性获取，
-   如果提前退出（break/异常），后面的页根本不会请求。
-
-4. 装饰器的优势：重试逻辑只写一次，@ 一行加到任何函数上就行。
-""")
+# 测试
+print("收集数据:")
+result = collect_data("/api/students")
+print(f"\n最终结果: {result}")
 
 
 # ============================================================

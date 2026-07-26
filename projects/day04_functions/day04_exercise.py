@@ -30,6 +30,49 @@ Day 4 练习题：函数进阶 + lambda + 作用域
 # ============================================================
 
 # TODO: 在这里写你的代码
+def print_table(title,headers,*rows,align = "left"):
+    #计算每列的最大宽度
+    col_widths  = []
+    for i,header in enumerate(headers):
+        max_w = len(header)
+        for row in rows:
+            #防越界
+            if i < len(row):
+                max_w = max(max_w,len(str(row[i])))
+        col_widths.append(max_w)
+    
+    print(f"=== {title} ===")
+    
+    #打印表头
+    header_parts =  []
+    for i ,header in enumerate(headers):
+        if align == "left":
+            header_parts.append(f"{header:<{col_widths[i]}}")
+        else :
+            header_parts.append(f"{header:^{col_widths[i]}}") 
+    print("|".join(header_parts))
+    
+    #打印分割线
+    print("=" * (sum(col_widths) + 3 * (len(headers) - 1) + 4))
+      
+    for row in rows:
+        row_parts = []
+        for i, cell in enumerate(row):
+            cell_str = str(cell) if i < len(row) else ""
+            if align == "left":
+                row_parts.append(f"{cell_str:<{col_widths[i]}}")
+            else:
+                row_parts.append(f"{cell_str:^{col_widths[i]}}")
+        print(" | ".join(row_parts))      
+    
+    print("=" * (sum(col_widths) + 3 * (len(headers) - 1) + 4))
+    print()
+                
+    
+
+print_table("学生列表", ["姓名", "年龄"], ("张三", 20), ("李四", 22), ("王五", 19))
+   
+
 
 
 # ============================================================
@@ -46,19 +89,32 @@ students = [
 
 # 任务 a：按 python 成绩从高到低排序，只打印名字
 # 预期输出：张三, 赵六, 李四, 王五
-# TODO: 在这里写你的代码
+
+sorted_by_python = sorted(students,key =lambda s: s["python"],reverse = True)
+
+
 
 
 # 任务 b：计算每个学生的总分，打印 (名字, 总分) 的列表，按总分从高到低排
 # 提示：可以先用 map 建一个包含总分的列表，再排序
 # 预期：李四 265, 张三 255, 赵六 250, 王五 253 ... 咦？需要算算看
-# TODO: 在这里写你的代码
+
+total_scores  =[(s["name"],s["math"]+s["english"]+s["python"]) for s in students]
+total_scores.sort(key  =  lambda x : x[1], reverse =  True)
+
+
+
+
 
 
 # 任务 c：筛选出所有科目都 >= 80 分的学生，打印他们的名字
 # 提示：用 all() 检查每个学生的三科成绩
 # 预期：李四, 赵六（张三 english=78<80，王五 math=78<80）
 # TODO: 在这里写你的代码
+
+all_pass = [s["name"] for s in students
+            if all(score >= 80 for score in [s["math"], s["english"], s["python"]])]
+print(f"全科 80 分以上: {all_pass}")
 
 
 # ============================================================
@@ -85,7 +141,16 @@ students = [
 # ============================================================
 
 # TODO: 在这里写你的代码
+def make_counter(start = 0,step = 1):
+    count = start  - step
+    # 这样第一次调用才会变成start
+    def  counter():
+        nonlocal count
+        count += step
+        return count
+    return counter
 
+    
 
 # ============================================================
 # 练习 4（综合）：文件版学生成绩分析器

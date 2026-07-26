@@ -149,7 +149,7 @@ def calc_averages(students):
       english = float(s["英语"])
       #round是四舍五入函数 1表示保留一位小数
       s["平均分"] = round((chinese + math + english) / 3, 1)
-      return students
+   return students
 
 
 # ============================================================
