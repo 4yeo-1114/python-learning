@@ -95,7 +95,8 @@ def calculator_menu():
       else:
          print(f"无效选项: {choice}，请输入 1-5")
  
-calculator_menu()
+#calculator_menu()
+
 
 # ============================================================
 # 练习 2：密码验证器
@@ -128,6 +129,47 @@ calculator_menu()
 """
 
 # TODO: 在这里写练习 2 的代码
+
+def validate_password(password:str) -> tuple:
+   if len(password) <6:
+      return False,"密码至少需要6位"
+   
+   if password.isdigit():
+      return False,"密码不能全是数字"
+   
+   if password.isalpha():
+      return False,"密码不能全是字母"
+   
+   return True,"密码有效"
+
+def register_flow():
+   print(f"\n===用户注册===")
+   
+   #输入用户名
+   while True:
+      username = input("用户名：").strip()
+      if username:
+         break
+      print("用户名不能为空")
+      
+   #输入密码
+   while True:
+      password = input("密码:").strip()
+      ok,msg = validate_password(password)
+      if ok:
+         break
+      print(f"密码不合格:{msg}")
+      
+   while True:
+      confirm = input("确认密码: ").strip()
+      if confirm == password:
+               break
+      print("两次密码不一致，请重新输入确认密码")
+    
+   print(f"\n注册成功！用户名: {username}")
+   return username, password 
+     
+     
 
 
 # ============================================================
@@ -170,7 +212,93 @@ import hashlib
 import os
 
 # TODO: 在这里写练习 3 的代码
+class UserDB:
+   def __init__(self,db_path="calculator.db"):
+      self.db_path = db_path
+      self._init_table()
+   
+   def _init_table(self):
+      with sqlite3.connect(self.db_path) as conn:
+         conn.execute(
+            """CREATE TABLE IF NOT EXISTS users(
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
+               username TEXT UNIQUE NOT NULL,
+               password_hash TEXT NOT NULL,
+               salt TEXT NOT NULL,
+               role TEXT DEFAULT 'student'
+            
+            )
+            
+            
+            """        
+         )
 
+   @staticmethod
+   def _hash_password(password:str)-> tuple:
+      salt = os.urandom(16).hex()
+      hashed = hashlib.sha256((password+salt).encode()).hexdigest()
+      return salt,hashed
+   
+   @staticmethod
+   def _verify_password(password:str,salt:str,stored_hash:str)->bool:
+      return hashlib.sha256((password + salt).encode()).hexdigest() == stored_hash
+   
+   #注册
+   def register(self,username: str, password: str, role="student") ->tuple:
+      salt,pw_hash = self._hash_password(password)
+      try:
+         with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+               "INSERT INTO users (username,password_hash,salt,role)"
+               "VALUES (?,?,?,?)",
+               (username,pw_hash,salt,role)
+               
+            )
+         return True,"注册成功"
+      except sqlite3.IntegrityError:
+         return False,"用户已存在"
+
+   def login(self, username: str, password: str) -> tuple:
+           """
+           验证登录
+           返回: (True, user_dict) 或 (False, "错误信息")
+           """
+           with sqlite3.connect(self.db_path) as conn:
+               conn.row_factory = sqlite3.Row
+               row = conn.execute(
+                   "SELECT id, username, password_hash, salt, role "
+                   "FROM users WHERE username = ?",
+                   (username,)
+               ).fetchone()
+   
+               if row is None:
+                   return False, "用户名不存在"
+   
+               if not self._verify_password(password, row["salt"], row["password_hash"]):
+                   return False, "密码错误"
+   
+               return True, {
+                   "id": row["id"],
+                   "username": row["username"],
+                   "role": row["role"],
+               }
+   
+   #获取所有用户
+   def get_all_user(self):
+      with sqlite3.connect(self.db_path) as conn:
+         conn.row_factory = sqlite3.Row
+         rows = conn.execute(
+            "SELECT id,username,role FROM users  ORDER BY id"
+         
+         ).fetchall()
+         return [dict(r) for r in rows]
+   
+   def count_users(self) -> int:
+           """返回用户总数"""
+           with sqlite3.connect(self.db_path) as conn:
+               row = conn.execute("SELECT COUNT(*) FROM users").fetchone()
+               return row[0]
+   
 
 print("\n[OK] 练习已准备就绪，开始写代码吧！")
 print("提示：先通读所有题目，从练习 1 开始逐个完成。")

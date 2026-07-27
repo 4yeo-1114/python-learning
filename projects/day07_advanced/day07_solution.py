@@ -210,7 +210,7 @@ def safe_fetch_all(urls, max_retries=2):
             try:
                 # 重新创建生成器（每次重试都从头开始）
                 gen = fetch_all([url])
-                item = next(gen)
+                item = next(gen) #拿到第一个结果
                 results.append(item)
                 print(f"[{url}] OK")
                 success = True
