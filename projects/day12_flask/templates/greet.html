@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}提交结果 — Flask 学习{% endblock %}
+
+{% block content %}
+    <h1>✅ 表单提交成功！</h1>
+
+    <div style="background: #e8f5e9; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; border-left: 4px solid #4caf50;">
+        <h2 style="color: #2e7d32; margin-bottom: 1rem;">你提交的数据：</h2>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold; width: 120px;">名字：</td>
+                <td style="padding: 0.5rem;">{{ name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">留言：</td>
+                <td style="padding: 0.5rem;">{{ message }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">喜欢的颜色：</td>
+                <td style="padding: 0.5rem;">{{ color }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+        <p><strong>💡 发生了什么？</strong></p>
+        <ol style="margin-left: 1.5rem;">
+            <li>浏览器向服务器发送了 <strong>POST 请求</strong></li>
+            <li>表单数据被编码在 <strong>请求体</strong> 中（不在 URL 里）</li>
+            <li>Flask 通过 <code>request.form</code> 获取数据</li>
+            <li>数据作为变量传给 <code>render_template()</code></li>
+            <li>Jinja2 用 <code>{{"{{ name }}"}}</code> 语法把变量值插入 HTML</li>
+        </ol>
+    </div>
+
+    <p style="margin-top: 2rem;">
+        <a href="{{ url_for('form_page') }}">← 返回表单</a>
+        &nbsp;|&nbsp;
+        <a href="{{ url_for('index') }}">🏠 返回首页</a>
+    </p>
+{% endblock %}

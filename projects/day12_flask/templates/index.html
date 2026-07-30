@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}首页 — Flask 学习{% endblock %}
+
+{% block content %}
+    <h1>🎉 欢迎来到 Flask Web 框架学习！</h1>
+    <p>这是 Day 12 的 Flask 学习项目首页。</p>
+    <p>今天你会学到：</p>
+    <ul>
+        <li><strong>路由 (Routing)</strong>：把 URL 映射到 Python 函数</li>
+        <li><strong>模板 (Templates)</strong>：用 Jinja2 渲染 HTML 页面</li>
+        <li><strong>表单 (Forms)</strong>：处理 GET/POST 请求</li>
+    </ul>
+
+    {% if username %}
+        <p style="color: green; font-weight: bold;">
+            👋 你好, {{ username }}！欢迎回来。
+        </p>
+    {% else %}
+        <p style="color: #888;">
+            提示：试试访问 <code>/user/你的名字</code> 看看动态路由的效果！
+        </p>
+    {% endif %}
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>📋 页面导航</h2>
+    <ul>
+        <li><a href="{{ url_for('about') }}">关于页面</a> — 另一个路由</li>
+        <li><a href="{{ url_for('user_page', name='Alice') }}">用户 Alice</a> — 动态路由示例</li>
+        <li><a href="{{ url_for('form_page') }}">表单练习</a> — GET/POST 表单</li>
+    </ul>
+{% endblock %}

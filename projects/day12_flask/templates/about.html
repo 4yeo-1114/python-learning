@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}关于 — Flask 学习{% endblock %}
+
+{% block content %}
+    <h1>📖 关于本项目</h1>
+    <p>这是 Python 学习计划 Day 12 的 Flask Web 框架练习项目。</p>
+    <p>本项目演示了 Flask 的核心概念：</p>
+
+    <h2>路由 (Routes)</h2>
+    <p>使用 <code>@app.route()</code> 装饰器将 URL 路径映射到 Python 函数。</p>
+
+    <h2>模板 (Templates)</h2>
+    <p>使用 Jinja2 模板引擎，通过 <code>render_template()</code> 渲染 HTML。</p>
+    <p>你现在看到的页面就是通过 <strong>模板继承</strong> 创建的 — 它继承了 <code>layout.html</code> 的导航栏和页脚。</p>
+
+    <h2>动态路由</h2>
+    <p>路由可以包含动态部分，比如 <code>/user/&lt;name&gt;</code>：</p>
+    <ul>
+        <li><a href="{{ url_for('user_page', name='Alice') }}">/user/Alice</a></li>
+        <li><a href="{{ url_for('user_page', name='Bob') }}">/user/Bob</a></li>
+        <li><a href="{{ url_for('user_page', name='Charlie') }}">/user/Charlie</a></li>
+    </ul>
+
+    <p style="margin-top: 2rem;">
+        <a href="{{ url_for('index') }}">← 返回首页</a>
+    </p>
+{% endblock %}

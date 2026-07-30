@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask 学习{% endblock %}</title>
+    <style>
+        /* 简单的样式，让页面好看一点 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", sans-serif; line-height: 1.6; color: #333; }
+        nav { background: #2c3e50; padding: 1rem 2rem; }
+        nav a { color: #ecf0f1; text-decoration: none; margin-right: 1.5rem; }
+        nav a:hover { color: #3498db; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        footer { text-align: center; padding: 1rem; background: #f5f5f5; margin-top: 3rem; color: #888; font-size: 0.9rem; }
+        h1 { color: #2c3e50; margin-bottom: 1rem; }
+        p { margin-bottom: 0.8rem; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">🏠 首页</a>
+        <a href="{{ url_for('about') }}">📖 关于</a>
+        <a href="{{ url_for('form_page') }}">📝 表单练习</a>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>Day 12 Flask 学习项目 &copy; 2026 — 从 CLI 到 Web 的范式转换</p>
+    </footer>
+</body>
+</html>
