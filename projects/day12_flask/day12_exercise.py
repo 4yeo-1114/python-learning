@@ -60,7 +60,15 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     # TODO: 返回包含标题、说明、导航链接的 HTML 字符串
-    pass
+    return render_template("index.html",username=None)
+
+@app.route("/about")
+def about():
+   return render_template("about.html")
+
+@app.route("/user/<name>")
+def user_page(name):
+   return render_template("index.html",username=name)
 
 
 # TODO: 完成关于页路由 "/about"
@@ -189,6 +197,18 @@ def index():
 
 # TODO: 完成 /form 路由（支持 GET 和 POST）
 # 提示: methods=["GET", "POST"]
+
+@app.route("/form",methods=["GET","POST"])
+def form_page():
+   if request.method == "POST":
+      name = request.form["name"]
+      message = request.form["message"]
+      color = request.form["color"]
+      
+      return render_template("greet.html",name = name,message = message,color = color)
+   
+   else:
+      return render_template("form.html")
 
 
 # ============================================================

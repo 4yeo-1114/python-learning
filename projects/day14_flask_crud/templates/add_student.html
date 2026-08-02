@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}添加学生{% endblock %}
+
+{% block content %}
+<h1>➕ 添加学生</h1>
+
+<form method="post" action="{{ url_for('add_student') }}">
+    <div class="form-group">
+        <label for="name">姓名 <span style="color: red;">*</span></label>
+        <input type="text" id="name" name="name"
+               value="{{ name or '' }}" placeholder="请输入姓名" required>
+    </div>
+    <div class="form-group">
+        <label for="age">年龄 <span style="color: red;">*</span></label>
+        <input type="number" id="age" name="age"
+               value="{{ age or '' }}" placeholder="请输入年龄 (1-150)"
+               min="1" max="150" required>
+    </div>
+    <div class="form-group">
+        <label for="grade">班级</label>
+        <input type="text" id="grade" name="grade"
+               value="{{ grade or '' }}" placeholder="如: 2024级1班">
+    </div>
+    <div class="form-group">
+        <label for="major">专业</label>
+        <input type="text" id="major" name="major"
+               value="{{ major or '' }}" placeholder="如: 计算机科学">
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn btn-success">✅ 提交</button>
+        <a href="{{ url_for('student_list') }}" class="btn">← 返回列表</a>
+    </div>
+</form>
+{% endblock %}

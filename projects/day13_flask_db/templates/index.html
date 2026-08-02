@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}首页{% endblock %}
+
+{% block content %}
+{% if session.get("user_id") %}
+<h1>👋 欢迎回来, {{ session.get("username") }}!</h1>
+<p>你的角色: <strong>{{ session.get("role") }}</strong></p>
+<p>
+    <a href="{{ url_for('student_list') }}" class="btn">📋 查看学生列表</a>
+    <a href="{{ url_for('logout') }}" class="btn">🚪 退出登录</a>
+</p>
+{% else %}
+<h1>🏫 学生管理系统</h1>
+<p>欢迎使用学生管理系统！请先登录或注册。</p>
+<p>
+    <a href="{{ url_for('login') }}" class="btn">🔐 登录</a>
+    <a href="{{ url_for('register') }}" class="btn">📝 注册</a>
+</p>
+{% endif %}
+{% endblock %}

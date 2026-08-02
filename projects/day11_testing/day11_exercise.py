@@ -621,7 +621,15 @@ class TestStudentDB:
       assert student["grade"] == grade
       assert student["major"] == major     
 
-
+# ============================================================
+print("\n[OK] 练习已准备就绪！")
+print("提示：3 道题层层递进——纯函数 → fixture → parametrize")
+print("答案见 day11_solution.py")
+print(f"预计时间：约 50-60 分钟（每题 15-20 分钟）")
+print()
+print("运行测试的命令：")
+print("  cd projects\\day11_testing")
+print("  python -m pytest day11_solution.py -v")
 
 
 if __name__ == "__main__":

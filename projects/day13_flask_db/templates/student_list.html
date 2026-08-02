@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}学生列表{% endblock %}
+
+{% block content %}
+<h1>📋 学生列表</h1>
+<p>欢迎, <strong>{{ username }}</strong>！以下是系统中所有学生的信息。</p>
+
+{% if students %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>班级</th>
+            <th>专业</th>
+            <th>创建时间</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in students %}
+        <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.age }}</td>
+            <td>{{ s.grade }}</td>
+            <td>{{ s.major }}</td>
+            <td>{{ s.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>共 {{ students|length }} 名学生</p>
+{% else %}
+<p class="empty-msg">暂无学生数据，请先添加学生。</p>
+{% endif %}
+
+<p><a href="{{ url_for('index') }}" class="btn">← 返回首页</a></p>
+{% endblock %}
