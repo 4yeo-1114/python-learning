@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<!-- row + justify-content-center = 水平居中；col-md-6 col-lg-4 = 响应式宽度 -->
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">🔐 登录</h3>
+
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form method="post" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" id="username" name="username" class="form-control"
+                               placeholder="请输入用户名" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">密码</label>
+                        <input type="password" id="password" name="password" class="form-control"
+                               placeholder="请输入密码" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">登录</button>
+                    </div>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    还没有账号？<a href="{{ url_for('register') }}">立即注册</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

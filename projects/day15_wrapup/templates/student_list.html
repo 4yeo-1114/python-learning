@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block title %}学生列表{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">📋 学生列表</h1>
+    <a href="{{ url_for('add_student') }}" class="btn btn-success">➕ 添加学生</a>
+</div>
+
+<p>欢迎, <strong>{{ username }}</strong>！</p>
+
+{# 搜索：input-group 把输入框和按钮粘在一起 #}
+<form method="get" action="{{ url_for('student_list') }}" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control"
+               value="{{ keyword or '' }}" placeholder="🔍 搜索姓名或专业...">
+        <button type="submit" class="btn btn-primary">搜索</button>
+        {% if keyword %}
+        <a href="{{ url_for('student_list') }}" class="btn btn-outline-secondary">清除</a>
+        {% endif %}
+    </div>
+</form>
+
+{% if keyword %}
+<p class="text-muted">搜索「{{ keyword }}」的结果，共 {{ students|length }} 条匹配</p>
+{% endif %}
+
+{% if students %}
+<!-- table-striped=斑马纹, table-hover=悬停高亮 -->
+<table class="table table-striped table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>ID</th><th>姓名</th><th>年龄</th><th>班级</th><th>专业</th><th>创建时间</th><th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in students %}
+        <tr>
+            <td>{{ s.id }}</td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.age }}</td>
+            <td>{{ s.grade }}</td>
+            <td>{{ s.major }}</td>
+            <td>{{ s.created_at }}</td>
+            <td>
+                <a href="{{ url_for('edit_student', student_id=s.id) }}"
+                   class="btn btn-sm btn-outline-primary">✏️ 编辑</a>
+                <form method="post" style="display:inline;"
+                      action="{{ url_for('delete_student', student_id=s.id) }}"
+                      onsubmit="return confirm('确定要删除学生「{{ s.name }}」吗？\n\n此操作不可撤销。')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ 删除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>共 {{ students|length }} 名学生</p>
+{% else %}
+<div class="alert alert-info">
+    {% if keyword %}
+    没有找到匹配「{{ keyword }}」的学生
+    {% else %}
+    暂无学生数据，请<a href="{{ url_for('add_student') }}" class="alert-link">添加学生</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<a href="{{ url_for('index') }}" class="btn btn-outline-secondary">← 返回首页</a>
+{% endblock %}
