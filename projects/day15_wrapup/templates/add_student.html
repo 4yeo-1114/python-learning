@@ -2,17 +2,17 @@
 {% block title %}添加学生{% endblock %}
 
 {% block content %}
+<!-- TODO 练习1-3: 表单用 Bootstrap form-control + mb-3 + form-label -->
 <h1>➕ 添加学生</h1>
 
 <form method="post" action="{{ url_for('add_student') }}">
-    <!-- mb-3 = 字段间距, form-label = 标签样式, form-control = 输入框样式 -->
     <div class="mb-3">
-        <label for="name" class="form-label">姓名 <span class="text-danger">*</span></label>
+        <label for="name" class="form-label">姓名</label>
         <input type="text" id="name" name="name" class="form-control"
                value="{{ name or '' }}" placeholder="请输入姓名" required>
     </div>
     <div class="mb-3">
-        <label for="age" class="form-label">年龄 <span class="text-danger">*</span></label>
+        <label for="age" class="form-label">年龄</label>
         <input type="number" id="age" name="age" class="form-control"
                value="{{ age or '' }}" placeholder="请输入年龄 (1-150)"
                min="1" max="150" required>
@@ -27,7 +27,9 @@
         <input type="text" id="major" name="major" class="form-control"
                value="{{ major or '' }}" placeholder="如: 计算机科学">
     </div>
-    <button type="submit" class="btn btn-success">✅ 提交</button>
-    <a href="{{ url_for('student_list') }}" class="btn btn-outline-secondary">← 返回列表</a>
+    <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn btn-success">✅ 提交</button>
+        <a href="{{ url_for('student_list') }}" class="btn">← 返回列表</a>
+    </div>
 </form>
 {% endblock %}
